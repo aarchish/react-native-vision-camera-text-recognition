@@ -47,14 +47,14 @@ class VisionCameraTranslatorPlugin(proxy: VisionCameraProxy, options: Map<String
                 .setTargetLanguage(targetLanguage)
                 .build()
         } else {
-            println("Invalid language strings provided for translation.")
+            Log.w(TAG, "Invalid language strings provided for translation: from=$from, to=$to")
         }
         downloadModel()
     }
 
-    override fun callback(frame: Frame, params: MutableMap<String, Any>?) : Any? {
+    override fun callback(frame: Frame, params: MutableMap<String, Any>?) : Any {
         val mediaImage: Image = frame.image
-        println(" OKKK ${ frame.imageProxy.imageInfo.rotationDegrees }")
+        Log.d(TAG, "Processing frame with rotation: ${frame.imageProxy.imageInfo.rotationDegrees}")
         val image = InputImage.fromMediaImage(mediaImage, frame.imageProxy.imageInfo.rotationDegrees)
         val task: Task<Text> = recognizer.process(image)
         try {
@@ -66,9 +66,9 @@ class VisionCameraTranslatorPlugin(proxy: VisionCameraProxy, options: Map<String
                 this.translatedText = ""
             }
             return this.translatedText
-        }catch (e:Exception){
-            Log.e(TAG, "$e")
-            return null
+        } catch (e: Exception) {
+            Log.e(TAG, "Error processing frame: ${e.message}", e)
+            return ""
         }
     }
 
@@ -77,8 +77,8 @@ class VisionCameraTranslatorPlugin(proxy: VisionCameraProxy, options: Map<String
             .addOnSuccessListener {
                 this.translatedText = it
             }
-            .addOnFailureListener {
-                Log.e("ERROR", "$it")
+            .addOnFailureListener { exception ->
+                Log.e(TAG, "Translation failed: ${exception.message}", exception)
                 this.translatedText = ""
             }
     }
@@ -86,24 +86,27 @@ class VisionCameraTranslatorPlugin(proxy: VisionCameraProxy, options: Map<String
 
     private fun downloadModel(){
         modelManager.getDownloadedModels(TranslateRemoteModel::class.java)
-            .addOnSuccessListener {
-                it.forEach() { language ->
-                    models.plus(language.language)
+            .addOnSuccessListener { downloadedModels ->
+                downloadedModels.forEach { language ->
+                    models = models.plus(language.language)
                 }
                 if (models.contains(from) && models.contains(to)) {
                     isDownloaded = true
                 }
             }
-            .addOnFailureListener {
+            .addOnFailureListener { exception ->
+                Log.e(TAG, "Failed to get downloaded models: ${exception.message}", exception)
                 this.isDownloaded = false
             }
 
         if (!isDownloaded){
             translator.downloadModelIfNeeded(conditions)
                 .addOnSuccessListener {
+                    Log.d(TAG, "Translation model downloaded successfully")
                     this.isDownloaded = true
                 }
-                .addOnFailureListener {
+                .addOnFailureListener { exception ->
+                    Log.e(TAG, "Failed to download translation model: ${exception.message}", exception)
                     this.isDownloaded = false
                 }
         }

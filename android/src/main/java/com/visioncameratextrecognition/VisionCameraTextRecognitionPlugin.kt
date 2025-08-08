@@ -42,7 +42,7 @@ class VisionCameraTextRecognitionPlugin(proxy: VisionCameraProxy, options: Map<S
         }
     }
 
-    override fun callback(frame: Frame, arguments: Map<String, Any>?): HashMap<String, Any?>? {
+    override fun callback(frame: Frame, arguments: Map<String, Any>?): Any? {
         val data = WritableNativeMap()
         val mediaImage: Image = frame.image
         val image =
@@ -51,14 +51,14 @@ class VisionCameraTextRecognitionPlugin(proxy: VisionCameraProxy, options: Map<S
         try {
             val text: Text = Tasks.await(task)
             if (text.text.isEmpty()) {
-                return WritableNativeMap().toHashMap()
+                return emptyMap<String, Any>()
             }
             data.putString("resultText", text.text)
             data.putArray("blocks", getBlocks(text.textBlocks))
             return data.toHashMap()
         } catch (e: Exception) {
             e.printStackTrace()
-            return null
+            return emptyMap<String, Any>()
         }
     }
 

@@ -19,26 +19,26 @@ class PhotoRecognizerModule(reactContext: ReactApplicationContext) :
    private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
     @ReactMethod
-    fun process(uri:String,promise:Promise){
-        val parsedUri = Uri.parse(uri)
-        val data = WritableNativeMap()
-        val image = InputImage.fromFilePath(this.reactApplicationContext,parsedUri)
-        val task: Task<Text> = recognizer.process(image)
+    fun process(uri: String, promise: Promise) {
         try {
+            val parsedUri = Uri.parse(uri)
+            val data = WritableNativeMap()
+            val image = InputImage.fromFilePath(this.reactApplicationContext, parsedUri)
+            val task: Task<Text> = recognizer.process(image)
+            
             val text: Text = Tasks.await(task)
             if (text.text.isEmpty()) {
                 promise.resolve(WritableNativeMap())
+                return
             }
+            
             data.putString("resultText", text.text)
             data.putArray("blocks", VisionCameraTextRecognitionPlugin.getBlocks(text.textBlocks))
-             promise.resolve(data)
+            promise.resolve(data)
         } catch (e: Exception) {
             e.printStackTrace()
-           promise.reject("Error", "Error processing image")
+            promise.reject("TEXT_RECOGNITION_ERROR", "Error processing image: ${e.message}", e)
         }
-
-    promise.resolve(true)
-
     }
     override fun getName(): String {
         return NAME

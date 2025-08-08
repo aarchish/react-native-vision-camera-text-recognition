@@ -1,12 +1,7 @@
-export type {
-  Frame,
-  ReadonlyFrameProcessor,
-  FrameProcessorPlugin,
-  FrameInternal,
-  CameraProps,
-  CameraDevice,
-} from 'react-native-vision-camera';
 export type { ForwardedRef } from 'react';
+export type {
+  CameraDevice, CameraProps, Frame, FrameInternal, FrameProcessorPlugin, ReadonlyFrameProcessor
+} from 'react-native-vision-camera';
 import type { CameraProps, Frame } from 'react-native-vision-camera';
 
 export type Languages =
@@ -139,4 +134,5 @@ export type PhotoOptions = {
     | 'portrait'
     | 'portraitUpsideDown'
     | 'landscapeLeft';
+  language?: 'latin' | 'chinese' | 'devanagari' | 'japanese' | 'korean';
 };

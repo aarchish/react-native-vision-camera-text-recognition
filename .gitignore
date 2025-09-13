@@ -29,6 +29,11 @@ DerivedData
 *.xcuserstate
 project.xcworkspace
 
+# iOS build / CocoaPods
+ios/Pods/
+ios/Podfile.lock
+ios/build/
+
 # Android/IJ
 #
 .classpath
@@ -39,6 +44,9 @@ project.xcworkspace
 .settings
 local.properties
 android.iml
+android/.gradle/
+android/build/
+android/app/build/
 
 # Cocoapods
 #
@@ -70,7 +78,6 @@ android/keystores/debug.keystore
 !.yarn/versions
 .yarnrc.yml
 .yarn
-yarn.lock
 # Expo
 .expo/
 
@@ -91,15 +98,12 @@ lib/
 
 # Github
 
-.gitattributes
-.github
+# keep repo metadata tracked (.gitattributes, .github)
 
 # LeftHook
 
 lefthook.yml
-package-lock.json
 # Example
-example
 .pnp/
 .pnp.*
 
